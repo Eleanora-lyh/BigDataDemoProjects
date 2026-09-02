@@ -68,8 +68,9 @@ def main() -> None:
     # Convert point-wise flags into time intervals suitable for alert records.
     print(f"Anomaly events: {to_events(anomalies)}")
 
-    # Create the output directory on first run and persist the annotated chart.
-    output_path = Path("artifacts/basic_detection.png")
+    # Keep generated files inside this demo, regardless of the terminal's CWD.
+    project_root = Path(__file__).resolve().parents[1]
+    output_path = project_root / "artifacts" / "basic_detection.png"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plot(
         series,

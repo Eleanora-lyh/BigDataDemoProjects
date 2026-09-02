@@ -4,9 +4,10 @@
 
 > 验证日期：2026-09-01  
 > 操作系统：Windows  
-> 工作区根目录：`BigDataLearningNotes`
+> 仓库根目录：`BigDataLearningNotes`  
+> Demo 项目根目录：`BigDataLearningNotes\ADTK\Demo`
 
-下面的 PowerShell 命令均在项目根目录中执行。
+除步骤 1 外，下面的 PowerShell 命令均在 `ADTK\Demo` 项目根目录中执行。
 
 ## 1. 最终项目状态
 
@@ -34,24 +35,24 @@
 
 ## 2. 从零搭建与验证
 
-### 步骤 1：检查工作区并确定项目根目录
+### 步骤 1：创建并进入独立 Demo 目录
 
-在 VS Code 中直接打开 `BigDataLearningNotes` 文件夹，并在终端中确认当前位置和 Python 3.12：
+在 VS Code 中打开 `BigDataLearningNotes` 文件夹，然后从仓库根目录创建并进入 ADTK Demo：
 
 ```powershell
+New-Item -ItemType Directory -Force .\ADTK\Demo | Out-Null
+Set-Location .\ADTK\Demo
 Get-Location
 py -3.12 --version
 ```
 
-预期第二条命令输出 `Python 3.12.x`。当前项目验证时使用的是 `Python 3.12.10`。
+`Get-Location` 应以 `BigDataLearningNotes\ADTK\Demo` 结尾，版本命令应输出 `Python 3.12.x`。当前项目验证时使用的是 `Python 3.12.10`。
 
-直接把当前文件夹作为项目根目录，不再嵌套一层同名目录。
+使用独立 Demo 目录的原因：
 
-这样做的原因：
-
-- VS Code 打开当前文件夹后，可以直接识别 `.venv`、`requirements.txt` 和示例代码。
-- 运行命令时路径更短，输出目录也固定在项目根目录下。
-- 避免形成 `BigDataLearningNotes/BigDataLearningNotes/...` 之类的重复结构。
+- ADTK 的源码、依赖、虚拟环境和生成物集中在同一目录中。
+- 仓库以后加入其他框架或示例时，可以为每个项目保留独立环境。
+- 从 Demo 目录运行后，后续命令仍可使用简短的 `.venv`、`examples` 和 `artifacts` 相对路径。
 
 明确指定 Python 3.12，是为了避免误用本机的 Python 3.13，并让虚拟环境与本文验证过的版本保持一致。
 
@@ -59,23 +60,26 @@ py -3.12 --version
 
 ```text
 BigDataLearningNotes/
-├── .venv/                         # 本地虚拟环境，不提交到 Git
-├── .vscode/
-│   └── settings.json              # 当前工作区的 VS Code 设置
-├── artifacts/                     # 示例生成的图片，不提交到 Git
-├── examples/
-│   └── basic_detection.py         # ADTK 基础检测示例
-├── .gitignore
-├── ADTK_PROJECT_SETUP.md          # 本文档
-├── README.md                      # 项目使用入口
-└── requirements.txt               # 可复现依赖约束
+└── ADTK/
+    └── Demo/
+        ├── .venv/                         # Demo 专用虚拟环境，不提交到 Git
+        ├── .vscode/
+        │   └── settings.json              # 单独打开 Demo 时的 VS Code 设置
+        ├── artifacts/                     # 示例生成的图片，不提交到 Git
+        ├── assets/                        # 文档使用的结果截图
+        ├── examples/
+        │   └── basic_detection.py         # ADTK 基础检测示例
+        ├── .gitignore
+        ├── ADTK_PROJECT_SETUP.md          # 本文档
+        ├── README.md                      # Demo 使用入口
+        └── requirements.txt               # 可复现依赖约束
 ```
 
-成功判据：`Get-Location` 指向项目根目录，并且 `py -3.12 --version` 能正常输出版本。
+成功判据：`Get-Location` 指向 `ADTK\Demo`，并且 `py -3.12 --version` 能正常输出版本。
 
 ### 步骤 2：创建并确认虚拟环境
 
-通过 VS Code 的 Python 环境工具在项目根目录创建 `.venv`。等价的 PowerShell 命令是：
+在 `ADTK\Demo` 中创建该 Demo 专用的 `.venv`：
 
 ```powershell
 py -3.12 -m venv .venv
@@ -90,7 +94,7 @@ py -3.12 -m venv .venv
 该解释器的路径为：
 
 ```text
-<项目根目录>\.venv\Scripts\python.exe
+<仓库根目录>\ADTK\Demo\.venv\Scripts\python.exe
 ```
 
 本项目确认的 Python 版本为 `3.12.10`。
@@ -107,10 +111,11 @@ py -3.12 -m venv .venv
 
 1. 按 `Ctrl+Shift+P`。
 2. 执行 `Python: Select Interpreter`。
-3. 选择 `.venv\Scripts\python.exe`。
-4. 查看 VS Code 状态栏，确认当前解释器来自项目 `.venv`。
+3. 如果单独打开了 `ADTK\Demo`，选择 `.venv\Scripts\python.exe`。
+4. 如果打开的是整个仓库，选择 `ADTK\Demo\.venv\Scripts\python.exe`。
+5. 查看 VS Code 状态栏，确认当前解释器来自 Demo 的 `.venv`。
 
-本次最终检查表明，VS Code/Pylance 当前选中的解释器已经是项目 `.venv`。
+`ADTK\Demo\.vscode\settings.json` 也配置了 Demo 的默认解释器。该配置在单独用 VS Code 打开 `ADTK\Demo` 文件夹时生效。
 
 成功判据：项目根目录中存在 `.venv`，版本检查成功，并且 VS Code 状态栏显示该虚拟环境。
 
@@ -293,8 +298,9 @@ def main() -> None:
     # Convert point-wise flags into time intervals suitable for alert records.
     print(f"Anomaly events: {to_events(anomalies)}")
 
-    # Create the output directory on first run and persist the annotated chart.
-    output_path = Path("artifacts/basic_detection.png")
+    # Keep generated files inside this demo, regardless of the terminal's CWD.
+    project_root = Path(__file__).resolve().parents[1]
+    output_path = project_root / "artifacts" / "basic_detection.png"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plot(
         series,
@@ -333,7 +339,7 @@ if __name__ == "__main__":
 
 ADTK 0.6.2 使用旧 Matplotlib 样式名 `seaborn-whitegrid`，当前示例在旧名称不存在时，把它映射到新版名称 `seaborn-v0_8-whitegrid`。这个兼容处理让代码仍然调用 ADTK 原生的 `plot`，同时能够使用当前验证过的 Matplotlib。
 
-脚本通过 `output_path.parent.mkdir(parents=True, exist_ok=True)` 自动创建 `artifacts` 目录，因此第一次运行前不需要手工创建输出目录。
+脚本通过 `Path(__file__).resolve().parents[1]` 从脚本位置定位 `ADTK\Demo`，因此即使从仓库根目录启动，图片也会写入本 Demo 的 `artifacts`。`output_path.parent.mkdir(parents=True, exist_ok=True)` 会自动创建输出目录，第一次运行前不需要手工创建。
 
 成功判据：`.gitignore`、`README.md` 和 `examples\basic_detection.py` 均已存在，示例文件包含数据生成、检测、结果断言和绘图逻辑。
 
@@ -368,12 +374,12 @@ ADTK 0.6.2 使用旧 Matplotlib 样式名 `seaborn-whitegrid`，当前示例在�
 运行输出为：
 
 ```text
-(.venv) PS ProjectRoot\BigDataLearningNotes> .\.venv\Scripts\python.exe examples\basic_detection.py              
+(.venv) PS ProjectRoot\BigDataLearningNotes\ADTK\Demo> .\.venv\Scripts\python.exe examples\basic_detection.py
 Detected 2 anomalous points:
 - 2026-01-05 06:00:00: 33.88
 - 2026-01-11 18:00:00: 5.95
 Anomaly events: [(Timestamp('2026-01-05 06:00:00'), Timestamp('2026-01-05 06:59:59.999999999')), (Timestamp('2026-01-11 18:00:00'), Timestamp('2026-01-11 18:59:59.999999999'))]
-Chart saved to ProjectRoot\BigDataLearningNotes\artifacts\basic_detection.png
+Chart saved to ProjectRoot\BigDataLearningNotes\ADTK\Demo\artifacts\basic_detection.png
 ```
 
 打开图片显示
@@ -389,7 +395,7 @@ Chart saved to ProjectRoot\BigDataLearningNotes\artifacts\basic_detection.png
 完成以上步骤后，项目应满足：
 
 - `.venv` 使用 Python 3.12，并与系统 Python 隔离。
-- VS Code/Pylance 选择 `.venv\Scripts\python.exe`。
+- VS Code/Pylance 选择 `ADTK\Demo\.venv\Scripts\python.exe`。
 - 核心依赖位于 `requirements.txt` 指定的兼容范围内。
 - `basic_detection.py` 语法检查通过。
 - 示例准确检测两个已知异常点。

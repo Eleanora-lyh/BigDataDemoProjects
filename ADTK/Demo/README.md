@@ -2,6 +2,8 @@
 
 这是一个用于练习 [ADTK](https://adtk.readthedocs.io/) 时间序列异常检测的最小 Python 项目。示例不依赖外部数据，会生成带有两个已知异常点的小时级时间序列，然后完成数据校验、模型拟合、异常检测和结果绘图。
 
+项目位于 `BigDataLearningNotes\ADTK\Demo`，拥有独立的源码、依赖和虚拟环境，不会与仓库中的其他学习项目混用配置。
+
 ## 环境
 
 - Windows
@@ -10,6 +12,16 @@
 - 项目虚拟环境：`.venv`
 
 ADTK 0.6.2 发布于 2020 年，依赖声明没有上限。`requirements.txt` 因此限制了主要科学计算包的版本范围，避免直接解析到未经 ADTK 验证的新主版本。
+
+## 进入项目目录
+
+从 `BigDataLearningNotes` 仓库根目录执行：
+
+```powershell
+Set-Location .\ADTK\Demo
+```
+
+下文命令均在 `ADTK\Demo` 中运行。
 
 ## 安装
 
@@ -20,6 +32,8 @@ ADTK 0.6.2 发布于 2020 年，依赖声明没有上限。`requirements.txt` �
 ```
 
 在 VS Code 中选择解释器时，使用 `.venv\Scripts\python.exe`。
+
+完整的环境搭建过程和代码讲解见 [ADTK_PROJECT_SETUP.md](ADTK_PROJECT_SETUP.md)。
 
 ## 运行第一个示例
 
