@@ -1,0 +1,46 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local IDE metadata (keep shared VS Code configuration)
+.idea/
+*.iml
+.vs/
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# Scala / Java build output and language servers
+target/
+*.class
+.bsp/
+.bloop/
+.metals/
+.scala-build/
+.ammonite/
+
+# Spark runtime output
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Local environment variables (keep templates)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Logs
+*.log
