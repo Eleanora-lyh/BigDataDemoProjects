@@ -8,7 +8,8 @@ lazy val root = (project in file("."))
 
     // ========== 依赖 ==========
     libraryDependencies ++= Seq(
-      "org.apache.spark" %% "spark-core" % "3.5.9" % "provided",
-      "org.apache.spark" %% "spark-sql"  % "3.5.9" % "provided"
+      "org.apache.spark" %% "spark-core" % "3.5.9",
+      "org.apache.spark" %% "spark-sql"  % "3.5.9"
     ),
+    Compile / run / fork := true
   )

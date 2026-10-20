@@ -19,6 +19,7 @@ object LineCountApp {
       .master("local[*]")// 设置本地运行模式为local，使用所有可用的 CPU 核心，正式项目一般不声明
       .getOrCreate()
 
+
     try {
       // 读取输入文件的所有行，返回Dataset[String]
       val lines = spark.read.textFile(inputPath)
