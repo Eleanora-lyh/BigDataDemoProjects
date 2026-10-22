@@ -4,7 +4,7 @@ import org.apache.spark.sql.SparkSession
 
 // 在项目目录运行：sbt "runMain com.example.RDDActionOperationsApp"
 object RDDActionOperationsApp {
-
+  //打印实际结果 + 验证结果
   private def checkResult[T](label: String, actual: T, expected: T): Unit = {
     println(s"$label: $actual")
     assert(actual == expected, s"$label: expected $expected, got $actual")
