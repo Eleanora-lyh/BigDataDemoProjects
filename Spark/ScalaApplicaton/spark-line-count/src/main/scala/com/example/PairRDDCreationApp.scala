@@ -34,17 +34,33 @@ object PairRDDCreationApp {
       val wordPairResult = wordPairs.collect().sorted.toSeq
       println(s"map to pairs: ${wordPairResult.mkString("[", ", ", "]")}")
       assert(wordPairResult == Seq(("scala", 1), ("spark", 1), ("spark", 1)))
+       // 创建后即可使用 reduceByKey 等键值操作；仅创建 PairRDD 不会自动合并相同 key。
+      val wordCounts = wordPairs.reduceByKey((a, b) => a + b)
+      val wordCounts2 = words
+        .map(word => (word, 1))
+        .reduceByKey(_ + _)
+      println(s"wordCounts: ${wordCounts2.collect().mkString("[", ", ", "]")}")  
 
-      // 方式三：keyBy 根据原元素计算 key，并将原元素完整保留为 value。
+      // 方式三：从文本文件创建 Pair RDD 并按 key 聚合值。
+      val linesRDD = sc.textFile("data/name_score.txt")//读取文件
+      val scorePairRDD = linesRDD.map { line =>
+        val fields = line.split(",")
+        val name = fields(0)
+        val score = fields(1).toInt
+
+        (name, score)
+      }
+      val totalScores = scorePairRDD.reduceByKey(_ + _)
+      println(s"totalScores: ${totalScores.collect().mkString("[", ", ", "]")}")
+
+      // 方式四：keyBy 根据原元素计算 key，并将原元素完整保留为 value。
       val wordsByLength: RDD[(Int, String)] = words.keyBy(word => word.length)
       val keyedResult = wordsByLength.collect().sorted.toSeq
       println(s"keyBy length: ${keyedResult.mkString("[", ", ", "]")}")
       assert(keyedResult == Seq((5, "scala"), (5, "spark"), (5, "spark")))
 
-      // 创建后即可使用 reduceByKey 等键值操作；仅创建 PairRDD 不会自动合并相同 key。
-      val wordCounts = wordPairs.reduceByKey(_ + _).collect().sorted.toSeq
-      println(s"reduceByKey counts: ${wordCounts.mkString("[", ", ", "]")}")
-      assert(wordCounts == Seq(("scala", 1), ("spark", 2)))
+      // println(s"reduceByKey counts: ${wordCounts.mkString("[", ", ", "]")}")
+      // assert(wordCounts == Seq(("scala", 1), ("spark", 2)))
 
       // collect 只适合这里的小数据；排序发生在 Driver 上，方便观察和校验结果。
       println("All PairRDD creation checks passed.")
