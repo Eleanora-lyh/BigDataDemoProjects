@@ -3,8 +3,8 @@ package com.example
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
-// 在项目目录运行：sbt "runMain com.example.PairRDDJoinApp"
-object PairRDDJoinApp {
+// 在项目目录运行：sbt "runMain com.example.PairRDD_3_3JoinOperationsApp"
+object PairRDD_3_3JoinOperationsApp {
 
   private def checkResult[T](label: String, actual: T, expected: T): Unit = {
     println(s"$label: $actual")
@@ -21,6 +21,15 @@ object PairRDDJoinApp {
     try {
       val sc = spark.sparkContext
       sc.setLogLevel("WARN")
+
+      // 对应文章中 A 的两条销售记录与两条成本记录的多对多连接。
+      val sales = sc.parallelize(Seq(("A", 10), ("A", 20)), numSlices = 2)
+      val costs = sc.parallelize(Seq(("A", 7), ("A", 8)), numSlices = 2)
+      checkResult(
+        "sales.join(costs): many-to-many",
+        sales.join(costs).collect().sorted.toSeq,
+        Seq(("A", (10, 7)), ("A", (10, 8)), ("A", (20, 7)), ("A", (20, 8)))
+      )
 
       // 两个 RDD 的 key 类型相同，value 类型可以不同；连接条件是 key 相等。
       val scores: RDD[(String, Int)] = sc.parallelize(

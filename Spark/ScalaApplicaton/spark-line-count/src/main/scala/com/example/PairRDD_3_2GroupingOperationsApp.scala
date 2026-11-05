@@ -3,8 +3,8 @@ package com.example
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
-// 在项目目录运行：sbt "runMain com.example.PairRDDGroupingApp"
-object PairRDDGroupingApp {
+// 在项目目录运行：sbt "runMain com.example.PairRDD_3_2GroupingOperationsApp"
+object PairRDD_3_2GroupingOperationsApp {
 
   private def checkResult[T](label: String, actual: T, expected: T): Unit = {
     println(s"$label: $actual")
