@@ -2,8 +2,8 @@ package com.example
 
 import org.apache.spark.sql.SparkSession
 
-// 在项目目录运行：sbt "runMain com.example.PairRDD_3ValueOperationsApp"
-object PairRDD_3ValueOperationsApp {
+// 在项目目录运行：sbt "runMain com.example.PairRDD_3_5ValueOperationsApp"
+object PairRDD_3_5ValueOperationsApp {
 
   private def checkResult[T](label: String, actual: T, expected: T): Unit = {
     println(s"$label: $actual")
