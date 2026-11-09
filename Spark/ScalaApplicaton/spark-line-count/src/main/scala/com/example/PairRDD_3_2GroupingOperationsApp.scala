@@ -54,15 +54,41 @@ object PairRDD_3_2GroupingOperationsApp {
       // 仅求和时优先 reduceByKey：可先在分区内合并，通常比传输全部 value 更省资源。
       // groupByKey 适合确实需要组内明细的场景；大 key 仍可能造成内存压力和数据倾斜。
       val expectedTotals = Seq(("Alice", 170), ("Bob", 140), ("Cindy", 100))
+      val groupedTotals = scores.groupByKey().mapValues(values => values.sum)
+      val reducedTotals = scores.reduceByKey(_ + _)
       checkResult(
         "groupByKey + sum: totals",
-        grouped.mapValues(_.sum).collect().sortBy(_._1).toSeq,
+        groupedTotals.collect().sortBy(_._1).toSeq,
         expectedTotals
       )
       checkResult(
         "reduceByKey: totals",
-        scores.reduceByKey(_ + _).collect().sortBy(_._1).toSeq,
+        reducedTotals.collect().sortBy(_._1).toSeq,
         expectedTotals
+      )
+      val partitionContents = scores.mapPartitionsWithIndex { (index, rows) =>
+        Iterator((index, rows.toList))
+      }.collect().toSeq
+      checkResult(
+        "scores: actual input partitions",
+        partitionContents,
+        Seq(
+          (0, List(("Alice", 80), ("Bob", 70))),
+          (1, List(("Alice", 90), ("Bob", 70), ("Cindy", 100)))
+        )
+      )
+      // 计数先把每条记录映射为 1；不能直接对分数求和来统计记录数。
+      val counts = scores.mapValues(_ => 1).reduceByKey(_ + _)
+      val maxima = scores.reduceByKey((left, right) => math.max(left, right))
+      checkResult(
+        "reduceByKey: record counts",
+        counts.collect().sortBy(_._1).toSeq,
+        Seq(("Alice", 2), ("Bob", 2), ("Cindy", 1))
+      )
+      checkResult(
+        "reduceByKey: maximum score",
+        maxima.collect().sortBy(_._1).toSeq,
+        Seq(("Alice", 90), ("Bob", 70), ("Cindy", 100))
       )
 
       // 3. cogroup：将多个 Pair RDD 按同一个 key 对齐，每个来源保留独立的集合。

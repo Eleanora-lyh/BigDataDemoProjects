@@ -1,6 +1,7 @@
 package com.example
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.HashPartitioner
 
 // 在项目目录运行：sbt "runMain com.example.PairRDD_3_5ValueOperationsApp"
 object PairRDD_3_5ValueOperationsApp {
@@ -54,6 +55,39 @@ object PairRDD_3_5ValueOperationsApp {
         "flatMapValues: tokenize text",
         tokens.collect().sorted.toSeq,
         Seq(("drink", "tea"), ("fruit", "apple"), ("fruit", "banana"))
+      )
+
+      val tokensByFlatMap = words.flatMap { case (key, text) =>
+        text.split(" ").map(word => (key, word))
+      }
+      val tokensByFlatMapValues = words.flatMapValues(_.split(" "))
+      checkResult(
+        "flatMap vs flatMapValues: same records",
+        tokensByFlatMap.collect().sorted.toSeq,
+        tokensByFlatMapValues.collect().sorted.toSeq
+      )
+      val allWords = words.flatMap { case (_, text) => text.split(" ") }
+      checkResult("flatMap: ordinary RDD", allWords.collect().sorted.toSeq, Seq("apple", "banana", "tea"))
+      val categoriesByWord = words.flatMap { case (category, text) =>
+        text.split(" ").map(word => (word, category))
+      }
+      checkResult(
+        "flatMap: choose a new key",
+        categoriesByWord.collect().sorted.toSeq,
+        Seq(("apple", "fruit"), ("banana", "fruit"), ("tea", "drink"))
+      )
+
+      // 必须先设置分区器，才能观察两种展开操作的分区信息差异。
+      val partitioner = new HashPartitioner(2)
+      val partitionedWords = words.partitionBy(partitioner)
+      val expandedPairs = partitionedWords.flatMap { case (key, text) =>
+        text.split(" ").map(word => (key, word))
+      }
+      checkResult("flatMap: discards partitioner", expandedPairs.partitioner, None)
+      checkResult(
+        "flatMapValues: preserves partitioner",
+        partitionedWords.flatMapValues(_.split(" ")).partitioner,
+        Some(partitioner)
       )
 
       println("All PairRDD value operation checks passed.")

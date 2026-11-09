@@ -27,6 +27,7 @@ object PairRDD_5PageRankApp {
     try {
       val sc = spark.sparkContext
       sc.setLogLevel("WARN")
+      // 准备持久化的暂存路径
       val runDirectory = Files.createTempDirectory("pair-rdd-pagerank-")
       val fs = FileSystem.newInstanceLocal(sc.hadoopConfiguration)
       val root = new Path(runDirectory.toUri)
